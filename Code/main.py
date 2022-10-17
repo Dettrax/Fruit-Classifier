@@ -1,3 +1,4 @@
+import os
 import warnings
 warnings.filterwarnings("ignore")
 import torch.nn as nn
@@ -24,7 +25,7 @@ def test_mode(data,model):
                     inputs1 = data1[0].type(torch.FloatTensor)
                     labels1 = data1[1].type(torch.FloatTensor)
                     #GPU CHECK
-                    if torch.cuda.is_available():
+                    if not torch.cuda.is_available():
                         inputs1 = Variable(inputs1.cuda())
                     else:
                         inputs1 = Variable(inputs1)
@@ -33,7 +34,7 @@ def test_mode(data,model):
                     
                     _,pred = torch.max(temp_out1,1)
                     total += labels1.size(0)
-                    if torch.cuda.is_available():
+                    if not torch.cuda.is_available():
                         correct+= ((pred.type(torch.FloatTensor)).cpu() == labels1.cpu()).sum()
                         
                     else:
@@ -117,14 +118,14 @@ def training_accuracy(temp_out,labels,loss):
     correct1=0
     _,pred = torch.max(temp_out,1)
     total1 += labels.size(0)
-    if torch.cuda.is_available():
+    if not torch.cuda.is_available():
         correct1+= ((pred.type(torch.FloatTensor)).cpu() == labels.cpu()).sum()
         
     else:
         correct1+= (pred.type(torch.FloatTensor) == labels).sum()
         #Average accuracy        
         acc1 = 100 * correct1/total1
-        print('Training loss is ',loss.data[0],'Training accuracy is ',acc1[0])
+        print('Training loss is ',loss.item(),'Training accuracy is ',acc1.item())
 
 def validating(model,validationloader,cost_fn):
     """Computes accuracy and loss of validation set"""
@@ -134,7 +135,7 @@ def validating(model,validationloader,cost_fn):
         data1 = dat1
         inputs1 = data1[0].type(torch.FloatTensor)
         labels1 = data1[1].type(torch.FloatTensor)
-        if torch.cuda.is_available():
+        if not torch.cuda.is_available():
             inputs1 = Variable(inputs1.cuda())
         else:
             inputs1 = Variable(inputs1)
@@ -143,14 +144,14 @@ def validating(model,validationloader,cost_fn):
         loss1 = cost_fn(temp_out1 , labels1.type(torch.LongTensor))
         _,pred = torch.max(temp_out1,1)
         total += labels1.size(0)
-        if torch.cuda.is_available():
+        if not torch.cuda.is_available():
             correct+= ((pred.type(torch.FloatTensor)).cpu() == labels1.cpu()).sum()
             
         else:
             correct+= (pred.type(torch.FloatTensor) == labels1).sum()
             
     acc = 100 * correct/total
-    print('Loss on valdation set ',loss1.data[0],'  Accuracy ',acc[0])
+    print('Loss on valdation set ',loss1.item(),'  Accuracy ',acc.item())
 
                 
 def train_model(dataset_path, debug=False, destination_path='', save=False):
@@ -166,7 +167,7 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
     
     train_dataset,test_dataset,validation_dataset = data_preprocessing(train_set,test_set)
  
-    trainloader,testloader,validationloader = make_trainloader(train_dataset,test_dataset,validation_dataset,10,1)
+    trainloader,testloader,validationloader = make_trainloader(train_dataset,test_dataset,validation_dataset,100,1)
     
     #temprory variables to store data and labels 
     data = []
@@ -180,7 +181,7 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
     #Stride has been set to 1
     model = FNet(in_channel=1,out_channels1=16,out_channels2=32,kernel1=5,pool_kernel=2,stride=1)
     
-    if torch.cuda.is_available():
+    if not torch.cuda.is_available():
         model.cuda()
     
     n_epochs  = 3
@@ -195,7 +196,7 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
             data = dat
             inputs = data[0].type(torch.FloatTensor)
             labels = data[1].type(torch.FloatTensor)
-            if torch.cuda.is_available():
+            if not torch.cuda.is_available():
                 inputs = Variable(inputs.cuda())
                 labels = Variable(labels.cuda())
             else:    
@@ -219,4 +220,4 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
    
 
 if __name__ == "__main__":
-	train_model(dataset_path='../Data/fruits/', debug=False,save=True, destination_path='./')
+	train_model(dataset_path='../Data/fruits/', debug=True,save=True, destination_path='./')
