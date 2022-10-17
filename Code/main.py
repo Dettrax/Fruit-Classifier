@@ -179,7 +179,7 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
     # kernel are for filter size
     # outchannels are for total number for kernels stack
     #Stride has been set to 1
-    model = FNet(in_channel=1,out_channels1=16,out_channels2=32,kernel1=5,pool_kernel=2,stride=1)
+    model = FNet(in_channel=1,out_channels1=64,out_channels2=128,kernel1=5,pool_kernel=2,stride=1)
     
     if not torch.cuda.is_available():
         model.cuda()
