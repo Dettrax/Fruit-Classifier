@@ -218,6 +218,8 @@ def train_model(dataset_path, debug=False, destination_path='', save=False):
     test_mode(testloader,model)
     
    
-
+import time
 if __name__ == "__main__":
-	train_model(dataset_path='../Data/fruits/', debug=True,save=True, destination_path='./')
+    now = time.time()
+    train_model(dataset_path='../Data/fruits/', debug=True,save=True, destination_path='./')
+    print("Time taken : ",time.time()-now)
